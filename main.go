@@ -40,7 +40,6 @@ func main() {
 		var id int
 		err = row.Scan(&id)
 		if err != nil {
-			log.Printf("Scan error: %v", err)
 			return err
 		}
 
