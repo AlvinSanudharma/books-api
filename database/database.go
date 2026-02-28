@@ -6,8 +6,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var DB *sql.DB
+
 func InitDb() {
-	dsn := "postgres://postgres@localhost:5432/postgres?sslmode=disable"
+	dsn := "postgres://postgres@localhost:5432/books-api?sslmode=disable"
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		panic(err)
@@ -17,4 +19,6 @@ func InitDb() {
 	if err != nil {
 		panic(err)
 	}
+
+	DB = db
 }
