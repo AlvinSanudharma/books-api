@@ -5,6 +5,7 @@ import (
 
 	"github.com/AlvinSanudharma/books-api/database"
 	"github.com/AlvinSanudharma/books-api/dto"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -14,6 +15,14 @@ func CreateBookController(c *fiber.Ctx) error {
 	err := c.BodyParser(&request)
 	if err != nil {
 		return err
+	}
+
+	validate := validator.New()
+	err = validate.Struct(request)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(map[string]any{
+			"error": err.Error(),
+		})
 	}
 
 	row := database.DB.QueryRow("INSERT INTO books (title, description, author, genre, isbn, stock, publish_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id", request.Title, request.Description, request.Author, request.Genre, request.ISBN, request.Stock, request.PublishDate)
