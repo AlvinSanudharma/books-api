@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/AlvinSanudharma/books-api/database"
@@ -13,17 +14,24 @@ func ShowBookController(c *fiber.Ctx) error {
 
 	var response dto.BookResponse
 
-	err := database.DB.QueryRow("SELECT id, title, description FROM books WHERE id = $1", id).Scan(&response.ID, &response.Title, &response.Description)
+	row := database.DB.QueryRow("SELECT id, title, description FROM books WHERE id = $1", id)
+	if row.Err() != nil {
+		fmt.Println("Error executing query:", row.Err())
+
+		return row.Err()
+	}
+
+	err := row.Scan(&response.ID, &response.Title, &response.Description)
 	if err != nil {
 		message := err.Error()
+
 		if message == "sql: no rows in result set" {
 			return c.Status(http.StatusNotFound).JSON(map[string]any{
 				"error": "Book not found",
 			})
 		}
-		return c.Status(http.StatusInternalServerError).JSON(map[string]any{
-			"error": "Failed to retrieve book",
-		})
+
+		return err
 	}
 
 	return c.Status(http.StatusOK).JSON(map[string]any{
