@@ -15,6 +15,7 @@ func main() {
 
 	app.Post("/api/books", controller.CreateBookController)
 	app.Get("/api/books/:id", controller.ShowBookController)
+	app.Delete("/api/books/:id", controller.DeleteBookController)
 
 	log.Fatal(app.Listen(":3000"))
 }
