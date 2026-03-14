@@ -2,8 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"regexp"
-	"strings"
 
 	"github.com/AlvinSanudharma/books-api/database"
 	"github.com/AlvinSanudharma/books-api/dto"
@@ -20,32 +18,11 @@ func CreateBookController(c *fiber.Ctx) error {
 	}
 
 	validate := validator.New()
+
 	err = validate.Struct(request)
 	if err != nil {
-		validationErrs := err.(validator.ValidationErrors)
 
-		errRes := make(map[string]string)
-		for _, validationErr := range validationErrs {
-			tag := validationErr.Tag()
-			message := "Unknown error"
-
-			switch tag {
-			case "required":
-				message = "Required"
-			case "min":
-				minimum := validationErr.Param()
-
-				message = "Minimum should be " + minimum
-			}
-
-			re := regexp.MustCompile("([a-z])([A-Z])")
-			snakeCase := re.ReplaceAllString(validationErr.Field(), "${1}_${2}")
-			errRes[strings.ToLower(snakeCase)] = message
-		}
-
-		return c.Status(http.StatusBadRequest).JSON(map[string]any{
-			"error": errRes,
-		})
+		return err
 	}
 
 	row := database.DB.QueryRow("INSERT INTO books (title, description, author, genre, isbn, stock, publish_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id", request.Title, request.Description, request.Author, request.Genre, request.ISBN, request.Stock, request.PublishDate)

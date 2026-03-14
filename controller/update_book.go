@@ -7,6 +7,7 @@ import (
 
 	"github.com/AlvinSanudharma/books-api/database"
 	"github.com/AlvinSanudharma/books-api/dto"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,6 +16,13 @@ func UpdateBookController(c *fiber.Ctx) error {
 
 	var request dto.UpdateBookRequest
 	err := c.BodyParser(&request)
+	if err != nil {
+		return err
+	}
+
+	validate := validator.New()
+
+	err = validate.Struct(request)
 	if err != nil {
 		return err
 	}
