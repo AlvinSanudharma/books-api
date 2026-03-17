@@ -56,6 +56,7 @@ func main() {
 	app.Get("/api/books/:id", controller.ShowBookController)
 	app.Delete("/api/books/:id", controller.DeleteBookController)
 	app.Put("/api/books/:id", controller.UpdateBookController)
+	app.Get("/api/books", controller.ListBookController)
 
 	log.Fatal(app.Listen(":3000"))
 }
