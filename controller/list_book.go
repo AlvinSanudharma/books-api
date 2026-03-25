@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/AlvinSanudharma/books-api/database"
 	"github.com/AlvinSanudharma/books-api/dto"
@@ -10,15 +11,30 @@ import (
 )
 
 func ListBookController(c *fiber.Ctx) error {
+	var request dto.ListBookRequest
 
-	rows, err := database.DB.Query("SELECT id, title, description, isbn, author, genre, stock, publish_date FROM books")
+	err := c.QueryParser(&request)
+	if err != nil {
+		return err
+	}
+
+	query := "SELECT id, title, description, isbn, author, genre, stock, publish_date FROM books"
+	var args []any
+	if request.Search != "" {
+		query += " WHERE LOWER(title) LIKE $1"
+		filter := fmt.Sprintf("%%%s%%", strings.ToLower(request.Search))
+
+		args = append(args, filter)
+	}
+
+	rows, err := database.DB.Query(query, args...)
 	if err != nil {
 		fmt.Println("Error executing query:", err)
 
 		return err
 	}
 
-	var response []dto.ListBook
+	response := make([]dto.ListBook, 0)
 
 	for rows.Next() {
 		var book dto.ListBook

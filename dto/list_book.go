@@ -1,5 +1,9 @@
 package dto
 
+type ListBookRequest struct {
+	Search string `query:"search"`
+}
+
 type ListBook struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
